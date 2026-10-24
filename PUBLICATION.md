@@ -4,6 +4,11 @@ This is a focused distribution of corrected v1.1.0 and the 21 October
 rolling-window control. It retains the active source, tests, configurations,
 simulated data, corrected reference results and report.
 
+The publication copy was prepared and checked locally, then committed and pushed
+to this GitHub repository. The first commit records publication of the snapshot,
+not the beginning of the project. This describes the publication workflow;
+code and analysis sources are documented separately in [PROJECT_HISTORY.md](PROJECT_HISTORY.md).
+
 The source revision is `72d137a5c21464f74a265284606162b61b69393c`, merged into the
 development repository as `4242f2734ce62d8b81f2ed24cd2cc2294db58c16`. The publication
 copy updates navigation and report publication details; experiment code and
@@ -18,7 +23,9 @@ additional files distributed here.
 ## Manifests and dated records
 
 - `PUBLICATION_MANIFEST.json` inventories the files in this publication snapshot
-  with SHA-256 hashes. The manifest itself is excluded from its own inventory.
+  with SHA-256 hashes. Its 24 October documentation update refreshes the recorded
+  hash for `PUBLICATION.md`; the original verification dates remain unchanged. The manifest itself
+  is excluded from its own inventory.
 - `corrected_v110/release_verification.json` contains the dated saved-output
   verification record. Its source paths and hashes describe that revision; some refer
   to development files not distributed here.
