@@ -12,7 +12,8 @@
     "rolling_control_replays": "3/3 passed",
     "full_reference_models_refitted_for_this_publication": false
   },
-  "inventory_note": "SHA-256 of snapshot files; this manifest excludes itself. Subsequent edits require a new inventory.",
+  "inventory_note": "SHA-256 of distributed files; this manifest excludes itself. Inventory refreshed on 2026-10-24 for the publication-workflow documentation note; original verification records retain their dates.",
+  "documentation_update": {"date": "2026-10-24", "scope": "PUBLICATION.md now explicitly describes local preparation before GitHub upload. No source code, tests, reports, reference results or source disclosures changed."},
   "files": {
     ".gitattributes": "828c3d5708971d152760eb729d196394720e0a60afe60da63bf964c359576098",
     ".github/workflows/verification.yml": "c3b28cdd4d4ad6dca038117e89243e50e14c27e6f21e4bfdfaae03d9e86a93dc",
@@ -120,7 +121,7 @@
     "data/README.md": "5cfb7e822387b7e41b424cab30314252f22786368c1555392e6fa19190129182",
     "data/simulated_hourly_market.csv": "0d808e9463cb3bad1f43d43450bc40fb413113593b33e0c0010e2e2b5b5cefa7",
     "PROJECT_HISTORY.md": "f6c8359b63ff0e3c78444a27346b3c9818fcf7e618c4c8c5d93eded9a8b6dcba",
-    "PUBLICATION.md": "d3e93ac2454799a412995798f1564a62b2c156ed15b48ab229a55796ece8f59e",
+    "PUBLICATION.md": "da0ec9f3c1b35abdaedd95369273d268a146f6a32964c3d3082449ed0d438fcb",
     "pyproject.toml": "914fbcc6e00255725f750ab1a7f837d9e05436004b0fa17caa62d0cdb31634d1",
     "README.md": "4075293fb2febedc17330776c93f2d3d3b509bec4ce1351f68a8c6b73900de41",
     "RELATED_WORK.md": "c634dd5e274c2425f0d09428ed4b545f98bba099378ccfd17720382bf3b13f87",
