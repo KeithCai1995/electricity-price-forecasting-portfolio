@@ -23,13 +23,9 @@ def prepare_output_root(root: str | Path, *, overwrite: bool = False) -> Path:
         raise ValueError("Git metadata cannot be an experiment output directory")
     if target.is_relative_to(repository):
         relative = target.relative_to(repository)
-        protected = {"src", "scripts", "tests", "configs", "data", "report", "historical", "evidence", ".github"}
+        protected = {"src", "scripts", "tests", "configs", "data", "report", "historical", "evidence", ".github", "corrected_v110"}
         if relative.parts[0].casefold() in protected:
             raise ValueError("Source, reports and preserved evidence cannot be overwritten by a run")
-        if relative.parts[0].casefold() == "corrected_v110" and (
-            len(relative.parts) < 2 or not relative.parts[1].casefold().startswith("supplementary_")
-        ):
-            raise ValueError("Existing corrected reference artifacts are protected; use local_runs/ or supplementary_*")
     if target.exists():
         if not target.is_dir():
             raise ValueError("Output root is not a directory")

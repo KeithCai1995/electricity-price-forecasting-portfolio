@@ -213,6 +213,48 @@ class TestOutputSafety(unittest.TestCase):
                 prepare_output_root(target, overwrite=True)
             self.assertEqual(sentinel.read_text(), "not a P1 run")
 
+    def test_marked_supplementary_reference_cannot_be_overwritten(self) -> None:
+        LOCAL_RUNS.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="p1_archive_", dir=LOCAL_RUNS) as directory:
+            repository = Path(directory)
+            archive = repository / "corrected_v110/supplementary_20261021"
+            archive.mkdir(parents=True)
+            marker = archive / ".p1_output.json"
+            marker.write_text(json.dumps({"project": "P1_forecasting_under_regime_shift"}), encoding="utf-8")
+            sentinel = archive / "comparison_metrics.csv"
+            sentinel.write_text("saved reference", encoding="utf-8")
+            before = {p.name: p.read_bytes() for p in archive.iterdir()}
+            with patch("energy_forecasting.output.REPOSITORY_ROOT", repository):
+                for target in (archive, archive / "baseline", archive / "../supplementary_20261021"):
+                    for overwrite in (False, True):
+                        with self.subTest(target=target, overwrite=overwrite), self.assertRaises(ValueError):
+                            prepare_output_root(target, overwrite=overwrite)
+            self.assertEqual({p.name: p.read_bytes() for p in archive.iterdir()}, before)
+
+    def test_new_output_cannot_be_created_inside_reference_tree(self) -> None:
+        LOCAL_RUNS.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="p1_archive_", dir=LOCAL_RUNS) as directory:
+            repository = Path(directory)
+            target = repository / "corrected_v110/supplementary_new"
+            with patch("energy_forecasting.output.REPOSITORY_ROOT", repository):
+                for overwrite in (False, True):
+                    with self.subTest(overwrite=overwrite), self.assertRaises(ValueError):
+                        prepare_output_root(target, overwrite=overwrite)
+            self.assertFalse(target.exists())
+
+    def test_supplementary_reference_is_rejected_before_fitting(self) -> None:
+        LOCAL_RUNS.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="p1_archive_", dir=LOCAL_RUNS) as directory:
+            repository = Path(directory)
+            target = repository / "corrected_v110/supplementary_20261021"
+            with patch("energy_forecasting.output.REPOSITORY_ROOT", repository), patch(
+                "energy_forecasting.experiment.fit_forecast_frames"
+            ) as fit:
+                with self.assertRaises(ValueError):
+                    run(ROOT / "configs/base.yaml", target, overwrite=True)
+                fit.assert_not_called()
+            self.assertFalse(target.exists())
+
     def test_run_and_seed_override_refuse_existing_output_before_model_execution(self) -> None:
         LOCAL_RUNS.mkdir(exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="p1_safety_", dir=LOCAL_RUNS) as directory:

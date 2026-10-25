@@ -239,7 +239,7 @@ uses Windows Python 3.13.15, NumPy 2.3.5, pandas 2.2.3, SciPy 1.17.0 and
 scikit-learn 1.8.0. Configurations, software versions and data fingerprints are
 recorded with each run; `requirements-lock.txt` gives the reference dependencies.
 
-The current verification consists of 28 unit and pipeline tests, checks of all
+The current verification consists of 35 unit and pipeline tests, checks of all
 five saved reference runs, and replay of all three fixed/adaptive rolling-control
 comparisons. The suite covers exact conformal ranks, alpha boundaries, ties,
 invalid inputs, infinity propagation, conditional diagnostics, configured
