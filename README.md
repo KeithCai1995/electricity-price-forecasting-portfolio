@@ -50,7 +50,7 @@ python -B scripts/run_experiment.py --config configs/base.yaml --output-root loc
 
 The tests include small real-model pipeline runs. The two saved-result checks
 do not fit models or change the reference files. See [VERIFICATION.md](VERIFICATION.md)
-for the scope of the 28 tests, five saved-output checks, three rolling-control
+for the scope of the 35 tests, five saved-output checks, three rolling-control
 replays and the GitHub workflow.
 
 To reproduce the remaining reference experiments, choose a new output directory
