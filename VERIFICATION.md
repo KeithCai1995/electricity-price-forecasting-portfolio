@@ -1,6 +1,6 @@
 # Verification
 
-The current checks cover 28 unit and pipeline tests, five saved-output
+The current checks cover 35 unit and pipeline tests, five saved-output
 comparisons and three rolling-control replays. Their execution metadata and
 results are recorded in [verification/current_checks.json](verification/current_checks.json),
 with output in [unit_tests.txt](verification/unit_tests.txt),
@@ -18,7 +18,7 @@ python -B scripts/check_rolling_control.py
 
 | Check | What it checks |
 | --- | --- |
-| 28 tests | Conformal ranks and infinite bounds, time ordering, configuration changes, output protection, plot axes, and a small real-model pipeline run |
+| 35 tests | Conformal ranks and infinite bounds, time ordering, configuration changes, reference-output protection, PDF link targets, plot axes, and a small real-model pipeline run |
 | Saved-output check, five runs | Recomputed interval metrics, forecast ordering and timestamps against the saved results |
 | Rolling-control replay, three seeds | Fixed-alpha and adaptive interval paths and metrics reconstructed from the saved raw forecasts |
 

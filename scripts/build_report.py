@@ -3,19 +3,39 @@
 This renders existing evidence only. It never runs or fabricates experiments.
 """
 from pathlib import Path
-from html import escape
+from html import escape, unescape
+from urllib.parse import quote, unquote, urlsplit
 import re
 import argparse
-import reportlab
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, PageBreak, Image, KeepTogether, Spacer
+
+ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY_URL = "https://github.com/KeithCai1995/electricity-price-forecasting-portfolio"
+
+
+def pdf_link_target(target: str, source: Path) -> str:
+    """Resolve repository links so the downloaded PDF works on its own."""
+    parts = urlsplit(target)
+    if parts.scheme or parts.netloc:
+        return target
+    destination = (source.parent / unquote(parts.path)).resolve() if parts.path else source.resolve()
+    relative = destination.relative_to(ROOT.resolve())
+    url = REPOSITORY_URL + "/blob/main/" + quote(relative.as_posix(), safe="/")
+    if parts.query:
+        url += "?" + parts.query
+    if parts.fragment:
+        url += "#" + parts.fragment
+    return url
 
 
 def main():
+    import reportlab
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, PageBreak, Image, KeepTogether, Spacer
+
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', type=Path, default=root/'report/report_v110.md')
@@ -32,7 +52,7 @@ def main():
         text = escape(text.replace('\u2011','-').replace('\u2013','-').replace('\u2014','-'))
         text = re.sub(r'\*\*(.+?)\*\*',r'<b>\1</b>',text)
         text = re.sub(r'`([^`]+)`',r'\1',text)
-        return re.sub(r'\[([^\]]+)\]\(([^\s)]+)\)',lambda m: '<link href="'+m[2]+'" color="#204968">'+m[1]+'</link>',text)
+        return re.sub(r'\[([^\]]+)\]\(([^\s)]+)\)',lambda m: '<link href="'+escape(pdf_link_target(unescape(m[2]), args.source), quote=True)+'" color="#204968">'+m[1]+'</link>',text)
     lines = args.source.read_text(encoding='utf-8').splitlines(); story=[]; i=0
     while i < len(lines):
         text=lines[i].strip()
