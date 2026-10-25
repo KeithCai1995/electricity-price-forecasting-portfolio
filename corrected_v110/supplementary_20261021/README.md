@@ -1,22 +1,22 @@
 # Supplementary rolling-window control — 21 October 2026
 
-This is a new supplementary study, not a rewrite or replacement of the corrected
-18 October reference runs. Existing forecasting CSVs, four reference tables per
-run, original logs and the downstream P2 input are unchanged.
+This study isolates alpha feedback from the effect of a rolling calibration
+window. It uses the same three seeds, raw forecasts and final evaluation blocks
+as the main forecasting experiments.
 
 ## Design
 
 Static by-horizon CQR uses all 82 original calibration days and then keeps its
-correction fixed. The original adaptive wrapper uses a rolling buffer of 30
+correction fixed. The adaptive wrapper uses a rolling buffer of 30
 scores per horizon **and** updates alpha. Comparing only those wrappers cannot
 separate rolling-window effects from alpha-feedback effects.
 
-The new control sets gamma to zero while keeping the same horizon groups,
+The fixed-alpha control sets gamma to zero while keeping the same horizon groups,
 initial trailing-30-score buffers, subsequent rolling raw scores, raw quantile
 model and target alpha=.20. The score buffer is independent of alpha. Thus the
 control and gamma=.015 wrapper differ only in alpha feedback.
 
-For each of the three previously used seeds, the full original baseline model
+For each of the three baseline seeds, the full baseline model
 was reconstructed once; raw test quantiles and adaptive bounds were checked
 against the preserved forecast before comparison. All raw quantiles and adaptive
 bounds matched exactly. Calibration and test raw frames are saved here so both
@@ -37,7 +37,7 @@ using this study and no new untouched evaluation period is claimed.
 Alpha feedback narrows intervals by .208–.493 EUR/MWh and moves these overall
 coverages closer to .80, but **worsens interval score in all three seeds** by
 .135–.266. There is no evidence here that alpha feedback improves interval score
-over the rolling fixed-alpha control. The earlier overall adaptive-versus-static
+over the rolling fixed-alpha control. The main adaptive-versus-static
 comparison evaluates a combined wrapper, not a separately established feedback
 benefit. This is a limited simulated comparison, not a significance test,
 real-market external validation, joint path calibration or coverage theorem.
@@ -60,4 +60,4 @@ The first command is read-only and does not retrain. The second reconstructs the
 three baseline models and writes a **new** output directory. Reusing a recognized
 P1 run directory requires explicit `--overwrite`; preserved reference directories
 remain protected. The manifest's source hashes describe the supplementary
-execution snapshot, not the earlier reference experiments.
+execution, rather than the complete current repository.

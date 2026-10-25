@@ -1,0 +1,6 @@
+PASS baseline: 1,992 forecasts; timing, ordering and all saved interval metrics
+PASS gamma_030: 1,992 forecasts; timing, ordering and all saved interval metrics
+PASS gamma_050: 1,992 forecasts; timing, ordering and all saved interval metrics
+PASS seed_20260818: 1,992 forecasts; timing, ordering and all saved interval metrics
+PASS seed_20260819: 1,992 forecasts; timing, ordering and all saved interval metrics
+5/5 preserved reference checks passed. No files written; no model rerun.

@@ -1,0 +1,4 @@
+PASS baseline: saved raw frames replay both rolling wrappers and their metrics
+PASS seed_20260818: saved raw frames replay both rolling wrappers and their metrics
+PASS seed_20260819: saved raw frames replay both rolling wrappers and their metrics
+3/3 supplementary replays passed. No model fitted and no files written.
