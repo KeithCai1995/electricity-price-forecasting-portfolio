@@ -1,16 +1,12 @@
 # P1: Probabilistic electricity-price forecasting under regime shift
 
-Corrected local edition v1.1.0 — 18 October 2026
-
-Technical verification and supplementary control update — 21 October 2026
-
-Publication snapshot — 23 October 2026; experiment results unchanged
+Reference implementation v1.1.0
 
 **SIMULATED BENCHMARK — NOT FIELD DATA.** This report concerns a research-training
 portfolio, not a named electricity market, employer, Tarim Oilfield or trading system.
-This report documents the correction, automated tests and saved reference
-experiments. Earlier v1.0.2 archives remain in the development repository and
-are not included in this publication snapshot.
+The reference experiments compare established forecasting and calibration methods
+on simulated data. Configurations, inputs and execution metadata accompany the
+saved results; [VERIFICATION.md](../VERIFICATION.md) explains the current checks.
 
 ## Purpose and experimental design
 
@@ -35,7 +31,7 @@ regime labels are excluded from model features. Static CQR uses either pooled
 calibration scores or separate horizon scores. The adaptive wrapper retains 30
 scores per horizon, target miscoverage .20 and reference gamma .015.
 
-## Corrected baseline: seed 20260817
+## Main baseline: seed 20260817
 
 | Method | Coverage | Mean width | Interval score |
 | --- | ---: | ---: | ---: |
@@ -53,7 +49,7 @@ distinguish interval wrappers. This sample does not establish general superiorit
 
 <!-- PAGE -->
 
-## Why v1.1.0 corrects the conformal calculation
+## Finite-sample conformal rank: implementation details
 
 For calibration score `s_i = max(lower_i - y_i, y_i - upper_i)` and `n` finite
 scores, set `k = ceil((n+1)*(1-alpha))`. For `1 <= k <= n`, the correction is sorted
@@ -61,35 +57,20 @@ score `s_(k)`, indexed `k-1` in code. If `k > n`, the augmented conformal score 
 positive infinity and the interval becomes unbounded. Alpha must be finite and
 strictly between zero and one. Empty, non-vector or nonfinite scores are rejected.
 
-The old implementation passed `k/n` to `np.quantile(..., method='higher')`.
-NumPy maps that probability using `n-1` positions, so this generally selects the
-next score. For scores 0–19, alpha .20 gives `k=17`: the correct value is 16,
-whereas the old code returns 17. It also capped `k>n` at the largest finite score,
-which cannot represent the required augmented infinity. Decimal alpha text is
-used for rank arithmetic to avoid `.7` at `n=9` becoming the wrong integer through
-binary roundoff; adjacent representable alpha values are tested separately.
+Passing `k/n` to `np.quantile(..., method='higher')` is not equivalent to selecting
+`s_(k)`: NumPy maps that probability using `n-1` positions. For scores 0–19, alpha
+.20 gives `k=17`: the required value is 16, whereas that quantile call returns 17.
+Capping `k>n` at the largest finite score would also lose the augmented
+infinity. Decimal alpha text is used for rank arithmetic to avoid `.7` at `n=9`
+becoming the wrong integer through binary roundoff; adjacent representable alpha
+values are tested separately.
 
 The score convention is based on established
 [conformalized quantile regression](https://arxiv.org/abs/1905.03222). Its standard
 finite-sample coverage justification requires the relevant exchangeability
 conditions. Changing the rank does not make those conditions hold in this
-dependent, shifted simulator.
-
-## Controlled comparison with preserved Windows v1.0.2
-
-| Method | Old coverage | New coverage | Old width | New width |
-| --- | ---: | ---: | ---: | ---: |
-| Raw | .556225 | .556225 | 11.896091 | 11.896091 |
-| Static pooled | .924197 | .924197 | 27.600691 | 27.580914 |
-| Static horizon | .927711 | .923695 | 29.282753 | 28.378878 |
-| Adaptive | .826305 | .806225 | 22.362592 | 21.274739 |
-
-The simulator fingerprint and all seven raw quantile columns match exactly across
-these two Windows runs. Adaptive interval score changes from 30.906253 to
-30.727504. The original Python 3.12 reference is a separate historical run with
-raw coverage .547691; it is not mixed into this controlled comparison. The
-coverage-width chart now uses a full coverage axis and a regression test checks
-that the historical .547691 raw point is visible.
+dependent, shifted simulator. The current rank selection and unattainable-rank
+behavior are covered by regression tests.
 
 ![Corrected baseline coverage versus unconditional mean width.](../corrected_v110/baseline/outputs/figures/figure_2_coverage_width.png)
 
@@ -108,7 +89,7 @@ independent basis for selecting a universally optimal adaptation rate.
 | .050 | .795181 | 20.784492 | 30.999364 |
 
 Here larger gamma slightly narrows intervals and reduces coverage; the interval
-score worsens. The corrected result is more cautious than a claim that faster
+score worsens. This result is more cautious than a claim that faster
 adaptation necessarily improves reliability. Static and raw metrics are unchanged
 across these gamma runs, as expected.
 
@@ -129,13 +110,13 @@ separate model stochasticity from simulated-market variation.
 
 <!-- PAGE -->
 
-## Supplementary fixed-alpha rolling control — 21 October
+## Fixed-alpha rolling-window control
 
 The static by-horizon method fixes a correction using all 82 calibration days;
-the adaptive wrapper both rolls a 30-score buffer and updates alpha. A new
+the adaptive wrapper both rolls a 30-score buffer and updates alpha. A
 gamma=0 control retains the identical rolling buffers, raw quantiles and alpha
 target .20, isolating feedback from the rolling-window effect. Each of the three
-original baseline models was reconstructed once, and its test raw quantiles and
+baseline models was reconstructed once, and its test raw quantiles and
 adaptive bounds matched the preserved reference exactly before comparison.
 
 | Seed | Fixed coverage | Fixed width | Fixed score | Adaptive score |
@@ -146,10 +127,10 @@ adaptive bounds matched the preserved reference exactly before comparison.
 
 Feedback narrows widths by .208–.493 EUR/MWh and moves coverage nearer .80, but
 worsens interval score in all three seeds by .135–.266. These data do not establish
-an interval-score advantage for alpha feedback alone. The earlier adaptive/static
-comparison evaluates the combined wrapper. New shared raw frames, interval paths,
-metrics and actual execution records are in `corrected_v110/supplementary_20261021/`;
-this is not a new untouched test set or a rewrite of the earlier evidence.
+an interval-score advantage for alpha feedback alone. The adaptive/static
+comparison evaluates the combined wrapper. Shared raw frames, interval paths,
+metrics and execution records are in `corrected_v110/supplementary_20261021/`.
+This control reuses the existing final blocks rather than an untouched test set.
 
 ## Infinity and clipping are part of the method boundary
 
@@ -166,20 +147,6 @@ This observation does not justify replacing future infinities with finite caps.
 If an unbounded interval occurs, unconditional mean width and interval score
 remain infinite. Explicit `finite_only_mean_width` and `finite_only_interval_score`
 columns describe the finite subset only; they do not replace full-sample metrics.
-
-## Configuration and verification update
-
-The 21 October suite passed 27 tests, adding a genuine small-model complete
-pipeline smoke at q05/q95 and a 90% target, configured plot/backtest checks,
-future-price/outcome perturbations, a fixed-alpha rolling control and protected
-output paths. A fresh complete default run reproduced all six baseline CSVs
-byte-for-byte, including the downstream P2 input. Separate read-only scripts check
-the five reference outputs and replay all three supplementary controls. The current
-suite has 28 tests, including the full-range rolling-coverage plot regression.
-The workflow runs on Ubuntu and Windows with Python 3.11 and 3.13. Results for this
-publication repository are recorded in its Actions tab and are separate from
-earlier development checks. These checks do not establish real-market validity
-or research novelty.
 
 <!-- PAGE -->
 
@@ -229,8 +196,8 @@ therefore hide a material reliability failure under a different segment of shift
 
 ## Timing and joint uncertainty limitations
 
-The historical code calls the task day-ahead, but daily issue time is midnight
-and target horizon 1 is that same midnight. Thus horizon 1 is nowcast-like and
+Daily issue time is midnight and target horizon 1 is that same midnight.
+Thus horizon 1 is nowcast-like and
 the other targets have lead times 1–23 hours. A claim of operational 24-hour
 day-ahead forecasting requires an adapter with a genuine prior issuance cutoff.
 
@@ -265,48 +232,47 @@ operational risk management.
 
 <!-- PAGE -->
 
-## Reproducibility, provenance and release status
+## Reproducibility and verification
 
-Version metadata and runtime version are both 1.1.0. The original Windows Python
-3.13.15 environment was used read-only; NumPy 2.3.5, pandas 2.2.3, SciPy 1.17.0 and
-scikit-learn 1.8.0 are recorded in manifests. Bytecode was disabled, plotting cache
-was redirected inside this workspace, and the corrected local `src` took priority
-over the original environment's editable installation. The reference experiments
-used a local source copy without writing to the Desktop or Downloads artifacts.
+Version metadata and runtime version are both 1.1.0. The reference environment
+uses Windows Python 3.13.15, NumPy 2.3.5, pandas 2.2.3, SciPy 1.17.0 and
+scikit-learn 1.8.0. Configurations, software versions and data fingerprints are
+recorded with each run; `requirements-lock.txt` gives the reference dependencies.
 
-The original reference suite passed 16 tests, including exact discrete indices, alpha boundaries,
-ties, nonfinite/invalid inputs, infinity propagation, infinite scores and explicit
-conditional diagnostics. A live chart regression includes the old raw .547691
-point. Existing checks cover chronological separation, forbidden future features,
-leading missing history, horizon separation, and an adaptive interval's independence
-from its own outcome. These tests check specific invariants; they are not a proof
-against every leakage route or every implementation defect.
+The current verification consists of 28 unit and pipeline tests, checks of all
+five saved reference runs, and replay of all three fixed/adaptive rolling-control
+comparisons. The suite covers exact conformal ranks, alpha boundaries, ties,
+invalid inputs, infinity propagation, conditional diagnostics, configured
+quantile/coverage targets, plot ranges and protected output paths. Temporal tests
+check chronological separation, forbidden future features, leading missing
+history, horizon separation, and independence from an interval's own outcome.
+Small real-model pipeline tests exercise the complete path without fitting the
+full 420-day reference models.
+
+The saved-output checker recalculates timing and interval metrics; the control
+checker replays both rolling wrappers from saved raw forecasts. Neither checker
+retrains a model or changes the reference files.
+The GitHub workflow runs on Ubuntu and Windows with Python 3.11 and 3.13; its
+results are in this repository's Actions tab. These are checks of specific
+invariants and saved results, not a proof against every defect or of real-market
+validity.
 
 Five full corrected experiment runs are saved under `corrected_v110/`: baseline,
 gamma .030, gamma .050, and additional baseline seeds 20260818/20260819. Each has
 a manifest, four tables, six figures, simulated data and forecast exports.
-Reference terminal logs and unit-test output are in `corrected_v110/logs/`.
-The dated manifests describe the source and artifacts used for those runs. Some
-entries refer to earlier source files or archives that are not distributed here;
-they are not an inventory of this publication snapshot. The separate
-`PUBLICATION_MANIFEST.json` lists the files in this snapshot. SHA256 identifies
-artifacts, not scientific validity. The Desktop working repository supplied
-only the read-only Python environment for the reference runs.
+Reference execution logs are in `corrected_v110/logs/`. Run and study manifests
+retain the actual execution dates, software versions, source hashes and input
+fingerprints. Current check results and output are in `verification/`. The separate
+`PUBLICATION_MANIFEST.json` lists the distributed files and their hashes.
 
 The baseline CSV has 1,992 rows and includes raw quantiles, pooled/horizon static
-bounds, adaptive bounds, alpha, correction and OOD columns. Its data fingerprint
-matches the original Windows run. The earlier v1.0.2 numerical outputs, report
-and reproduction records remain outside this snapshot in the development
-repository. This repository starts with the current release files, not the old
-Git history. Initial code and reference analyses were supplied; method sources
-and subsequent checks are described in `PROJECT_HISTORY.md` and `RELATED_WORK.md`.
-Documentation and report presentation wording was cleaned on 19 October 2026;
-the numerical artifacts were retained. The publication edit changes distribution
-notes, not the experiment dates, methods or numerical conclusions.
+bounds, adaptive bounds, alpha, correction and OOD columns. To run the tests,
+saved-result checks or a new experiment, follow the commands in
+[README.md](../README.md). [VERIFICATION.md](../VERIFICATION.md) describes the
+checks in more detail. Method references are in [RELATED_WORK.md](../RELATED_WORK.md).
 
-The corrected findings are narrower than a general performance claim: the rank
-defect is repaired and regression-tested; overall adaptive coverage is near .80
-in the evaluated final blocks, while stress subsets and one rolling fold fail.
+Overall adaptive coverage is near .80 in the evaluated final blocks, while
+stress subsets and one rolling fold fail.
 Three simulated seeds do not establish real-market external validity, arbitrary
 time-series coverage, or jointly reliable daily paths. A next study would need
 real publication vintages, a true issuance gap, delayed-label handling, additional
@@ -321,5 +287,4 @@ Source of the quantile-based conformity score and static CQR framework.
 Gibbs, I., and Candès, E. (2021).
 [Adaptive Conformal Inference Under Distribution Shift](https://arxiv.org/abs/2106.00170).
 Source motivating the adaptive update; its guarantees are not asserted for this
-clipped, rolling implementation. Both primary-source records were checked on
-18 October 2026. This report makes no priority claim beyond the local correction.
+clipped, rolling implementation.

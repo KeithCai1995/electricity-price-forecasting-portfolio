@@ -4,12 +4,6 @@ A simulated benchmark comparing quantile forecasts, static conformalized quantil
 regression (CQR), and a rolling adaptive CQR wrapper. It asks how their coverage,
 interval width and interval score change when the price-generating regime shifts.
 
-This repository publishes the current corrected v1.1.0 experiments and the
-fixed-alpha rolling-window control as a 23 October 2026 snapshot. The experiments
-were run on 18 and 21 October; this is not a new experiment date. See
-[project history](PROJECT_HISTORY.md) for the timeline and source note, and
-[publication details](PUBLICATION.md) for the contents of this snapshot.
-
 ## Main findings
 
 The baseline uses a 420-day simulator, a chronological train/calibration/test
@@ -56,7 +50,8 @@ python -B scripts/run_experiment.py --config configs/base.yaml --output-root loc
 
 The tests include small real-model pipeline runs. The two saved-result checks
 do not fit models or change the reference files. See [VERIFICATION.md](VERIFICATION.md)
-for their scope and the GitHub workflow.
+for the scope of the 28 tests, five saved-output checks, three rolling-control
+replays and the GitHub workflow.
 
 To reproduce the remaining reference experiments, choose a new output directory
 for each run:
@@ -91,14 +86,15 @@ inspect the rendered pages after changing the report source.
 | `corrected_v110/gamma_030/`, `gamma_050/` | Same-seed gamma sensitivities |
 | `corrected_v110/seed_20260818/`, `seed_20260819/` | Additional full baseline seeds |
 | `corrected_v110/supplementary_20261021/` | Fixed-alpha control, raw forecasts and replay results |
-| `corrected_v110/logs/` | Dated reference execution and test logs |
+| `corrected_v110/logs/` | Reference experiment execution logs |
+| `verification/` | Current test results, saved-output checks and rolling-control replays |
 | `report/` | Current report source and PDF |
 
 The baseline forecast exported for the downstream storage project is
 `corrected_v110/baseline/outputs/forecast_quantiles_test.csv` (1,992 rows).
-Dated manifests describe their original execution snapshots, not the current
-whole repository. [PUBLICATION.md](PUBLICATION.md) explains the separate
-publication inventory and omitted development archives.
+Run and study manifests record execution dates, inputs and software versions;
+`PUBLICATION_MANIFEST.json` inventories the distributed files. See
+[PUBLICATION.md](PUBLICATION.md) for the scope of this repository.
 
 ## Scope and limitations
 
@@ -127,3 +123,10 @@ not an untouched evaluation set or population-level inference.
 The methods are established; references and contribution boundaries are in
 [RELATED_WORK.md](RELATED_WORK.md). [RESPONSIBLE_USE.md](RESPONSIBLE_USE.md) covers
 the data-use scope.
+
+## Reading the study
+
+Start with the [report](report/Haorui_Cai_Forecasting_Report_v110.pdf) for the
+experimental design, results and limitations. [VERIFICATION.md](VERIFICATION.md)
+explains the checks and their scope; [PUBLICATION.md](PUBLICATION.md) describes
+the distributed material and file inventory.

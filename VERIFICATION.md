@@ -1,10 +1,11 @@
 # Verification
 
-The 23 October 2026 publication copy passed all 28 tests, all five saved-output
-comparisons and all three rolling-control replays locally. Source, tests,
-configurations, data, corrected reference files and the workflow were also
-byte-checked against the source revision. These local checks are separate from
-the new repository's GitHub Actions results.
+The current checks cover 28 unit and pipeline tests, five saved-output
+comparisons and three rolling-control replays. Their execution metadata and
+results are recorded in [verification/current_checks.json](verification/current_checks.json),
+with output in [unit_tests.txt](verification/unit_tests.txt),
+[saved_outputs.txt](verification/saved_outputs.txt) and
+[rolling_controls.txt](verification/rolling_controls.txt).
 
 Run these commands from the repository root after installing
 `requirements-lock.txt`:
@@ -35,15 +36,12 @@ to another repository.
 
 ## Reference records
 
-The reference outputs retain their original execution dates. Logs are in
-`corrected_v110/logs/`; the fixed-alpha study and its manifest are in
-`corrected_v110/supplementary_20261021/`. The original 18 October suite had 16
-tests. Subsequent regression tests brought the current suite to 28.
+The five forecasting runs are in `corrected_v110/`; the fixed-alpha study, shared
+raw forecasts and execution manifest are in
+`corrected_v110/supplementary_20261021/`. These records retain their actual
+execution dates, configurations and software versions. Reference experiment logs
+are in `corrected_v110/logs/`. The commands above verify saved results and replay
+the calibration wrappers; they do not retrain all five reference models.
 
-During the 21 October development update, a full default rerun matched all six
-baseline CSVs byte-for-byte, including the forecast used by the storage project.
-That dated comparison is separate from the lightweight checks above. Repeating
-it requires a new full run, not just a passing unit-test job.
-
-The [publication notes](PUBLICATION.md) distinguish dated run manifests from the
-current snapshot's file inventory.
+[PUBLICATION.md](PUBLICATION.md) describes the distributed material and its file
+inventory.

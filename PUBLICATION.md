@@ -1,42 +1,15 @@
-# Publication snapshot — 23 October 2026
+# Distributed study material
 
-This is a focused distribution of corrected v1.1.0 and the 21 October
-rolling-window control. It retains the active source, tests, configurations,
-simulated data, corrected reference results and report.
+This repository contains the source, tests, configurations, simulated inputs,
+five forecasting reference runs, fixed-alpha rolling-window controls, and the
+report source and PDF. The report can be read without consulting another repository.
 
-The publication copy was prepared and checked locally, then committed and pushed
-to this GitHub repository. The first commit records publication of the snapshot,
-not the beginning of the project. This describes the publication workflow;
-code and analysis sources are documented separately in [PROJECT_HISTORY.md](PROJECT_HISTORY.md).
+`PUBLICATION_MANIFEST.json` lists the distributed files and their SHA-256 hashes,
+excluding itself. Run and study manifests retain their actual execution dates,
+software versions, source hashes and input fingerprints; they describe those
+executions rather than the current whole-repository inventory. `<WORKSPACE>`
+replaces a machine-specific path prefix.
 
-The source revision is `72d137a5c21464f74a265284606162b61b69393c`, merged into the
-development repository as `4242f2734ce62d8b81f2ed24cd2cc2294db58c16`. The publication
-copy updates navigation and report publication details; experiment code and
-numerical reference results are retained.
-
-The new repository starts with one snapshot commit. It does not contain earlier
-Git commits, the superseded v1.0.2 archive or the development `evidence/` directory.
-The original repository and its history are not deleted by this publication.
-References to earlier results in the report describe earlier experiments, not
-additional files distributed here.
-
-## Manifests and dated records
-
-- `PUBLICATION_MANIFEST.json` inventories the files in this publication snapshot
-  with SHA-256 hashes. Its 24 October documentation update refreshes the recorded
-  hash for `PUBLICATION.md`; the original verification dates remain unchanged. The manifest itself
-  is excluded from its own inventory.
-- `corrected_v110/release_verification.json` contains the dated saved-output
-  verification record. Its source paths and hashes describe that revision; some refer
-  to development files not distributed here.
-- `corrected_v110/supplementary_20261021/study_manifest.json` records the
-  supplementary study's execution snapshot and reference-input checks, not the
-  entire current repository.
-
-Recorded source hashes, experiment dates and numerical values have not been
-rewritten to make these older records describe this publication. `<WORKSPACE>`
-in a path is a redacted machine-specific prefix, not an executable directory.
-
-Current verification commands are in [VERIFICATION.md](VERIFICATION.md). GitHub
-Actions results belong to the commit checked in this repository; development
-repository runs are not substitutes for those results.
+See [VERIFICATION.md](VERIFICATION.md) for current local check results and commands.
+The [GitHub Actions page](https://github.com/KeithCai1995/electricity-price-forecasting-portfolio/actions)
+reports automated checks for the commits run there.
